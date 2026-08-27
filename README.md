@@ -49,7 +49,7 @@ Sur un ordinateur, **Prévisualiser la salle** ouvre la même pièce : glisser p
 - **180°** — dôme avant, pour les captures VR 180.
 - **360°** — sphère complète. Tournez la tête.
 
-Les films du programme sont des courts métrages libres de droits en **MP4 H.264**, le codec le plus fiable sur Quest 2. Vous pouvez aussi charger un fichier depuis le casque ou une URL MP4.
+Les films du programme sont embarqués en **MP4 H.264**, le codec le plus fiable sur Quest 2. Vous pouvez aussi charger un fichier depuis le casque ou une URL MP4 (CORS requis pour le grand écran WebGL).
 
 ## Pile technique
 

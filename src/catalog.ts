@@ -1,54 +1,54 @@
 import type { VideoItem } from "./types.ts";
 
-/** Public-domain / CC films hosted with CORS, H.264 MP4 (codec sûr sur Quest 2). */
+/** Copies locales H.264 — lisibles hors-ligne et sans CORS sur Quest 2. */
 export const catalog: VideoItem[] = [
+  {
+    id: "trailer",
+    title: "Bande-annonce",
+    director: "Ciné VR",
+    duration: "10 s",
+    year: "2026",
+    synopsis:
+      "Générique de la salle. Un bon premier test d’écran, de velours et de cadrage 16:9.",
+    src: "/videos/trailer.mp4",
+    kind: "flat",
+    posterHue: 38,
+  },
   {
     id: "bunny",
     title: "Big Buck Bunny",
     director: "Blender Foundation",
-    duration: "10 min",
+    duration: "10 s",
     year: "2008",
     synopsis:
-      "Un lapin géant trop gentil décide de se venger des rongeurs qui lui pourrissent la vie. Idéal pour tester le grand écran.",
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      "Extrait du court métrage : un lapin trop gentil et des rongeurs insupportables. Boucle H.264 720p.",
+    src: "/videos/big-buck-bunny.mp4",
     kind: "flat",
     posterHue: 32,
-  },
-  {
-    id: "elephants",
-    title: "Elephants Dream",
-    director: "Blender Foundation",
-    duration: "11 min",
-    year: "2006",
-    synopsis:
-      "Deux personnages errent dans une machine impossible. Court métrage surréaliste, parfait en salle virtuelle.",
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    kind: "flat",
-    posterHue: 265,
   },
   {
     id: "sintel",
     title: "Sintel",
     director: "Blender Foundation",
-    duration: "15 min",
+    duration: "52 s",
     year: "2010",
     synopsis:
-      "Une jeune femme poursuit un dragon à travers des terres hostiles. Image cinémascope, très lisible en VR.",
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+      "Bande-annonce officielle. Une jeune femme poursuit un dragon — très lisible en grand écran VR.",
+    src: "/videos/sintel.mp4",
     kind: "flat",
     posterHue: 200,
   },
   {
-    id: "tears",
-    title: "Tears of Steel",
-    director: "Blender Foundation",
-    duration: "12 min",
-    year: "2012",
+    id: "sphere",
+    title: "Nébuleuse 360°",
+    director: "Ciné VR",
+    duration: "12 s",
+    year: "2026",
     synopsis:
-      "Amsterdam, robots et voyage temporel. Un bon test pour le mode 3D côte-à-côte si vous avez une copie SBS.",
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    kind: "flat",
-    posterHue: 8,
+      "Ciel equirectangulaire pour le mode Sphère. Tournez la tête : l’image vous entoure.",
+    src: "/videos/sphere-360.mp4",
+    kind: "360",
+    posterHue: 265,
   },
 ];
 

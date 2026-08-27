@@ -97,7 +97,11 @@ function setMode(mode: ViewMode): void {
 async function loadItem(item: VideoItem): Promise<void> {
   overlay.setSelected(item.id);
   if (item.kind === "360") setMode(ViewMode.Sphere);
-  await player.loadUrl(item.src, item.title, true);
+  else if (overlay.mode === ViewMode.Sphere || overlay.mode === ViewMode.Half) {
+    setMode(ViewMode.Cinema);
+  }
+  const remote = item.src.startsWith("http");
+  await player.loadUrl(item.src, item.title, remote);
 }
 
 async function detectHeadset(): Promise<void> {
