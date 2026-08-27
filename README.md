@@ -65,8 +65,22 @@ GitHub Pages : voir plus haut. Autre hébergeur : `npm run build`, puis publiez 
 - **180°** — dôme avant, pour les captures VR 180.
 - **360°** — sphère complète. Tournez la tête.
 
-Les films du programme sont embarqués en **MP4 H.264**. Vous pouvez aussi charger un fichier depuis le stockage du casque ou une URL MP4.
+Les films du programme sont embarqués en **MP4 H.264**. Vous pouvez aussi charger un fichier depuis le stockage du casque, une URL MP4, ou un **disque réseau SMB**.
+
+## Disque réseau SMB (NAS)
+
+Le navigateur du Quest ne parle pas le protocole SMB. Ciné VR s’y connecte **depuis le PC**, puis envoie le film en HTTPS au casque.
+
+1. Casque, PC et NAS sur le **même Wi‑Fi**.
+2. Sur le PC : `npm run dev:https`.
+3. Dans le Quest, ouvrez l’adresse HTTPS du PC (pas GitHub Pages).
+4. Section **Disque réseau** : IP du NAS, nom du partage, identifiant, mot de passe.
+5. Parcourez les dossiers, cliquez un MP4, puis **Entrer en VR**.
+
+GitHub Pages et Vercel ne peuvent pas joindre votre NAS. Pour essayer l’interface sans NAS, serveur `demo`, partage `videos` (les copies locales du projet).
+
+SMBv2/v3, port **445**. Compte `Guest` accepté si le NAS l’autorise.
 
 ## Pile technique
 
-Vite, TypeScript, Three.js, WebXR `immersive-vr`.
+Vite, TypeScript, Three.js, WebXR `immersive-vr`. Relais SMB via `@marsaud/smb2` côté serveur de dev.

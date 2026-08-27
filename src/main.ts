@@ -62,6 +62,11 @@ const overlay = new Overlay({
     void player.loadUrl(url, url, true);
     overlay.notify("Chargement de votre flux…");
   },
+  onSmbPlay: (url, title) => {
+    if (/360|equirect|vr180/i.test(title)) setMode(ViewMode.Sphere);
+    void player.loadUrl(url, title, false);
+    overlay.notify(`NAS : ${title}`);
+  },
   onCustomFile: (file) => {
     void player.loadFile(file);
     overlay.notify(`Fichier prêt : ${file.name}`);

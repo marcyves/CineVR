@@ -241,15 +241,131 @@ h1 {
   margin-top: 14px;
 }
 
-#video-url {
+#video-url,
+.smb-form input[type="text"],
+.smb-form input[type="password"],
+.smb-form input[type="number"] {
   flex: 1 1 220px;
   min-width: 0;
+  width: 100%;
   padding: 12px 14px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.35);
   color: var(--ink);
   font: inherit;
+}
+
+.smb-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+  margin-top: 16px;
+}
+
+.smb-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.smb-folder {
+  grid-column: 1 / -1;
+}
+
+.smb-remember {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
+.smb-remember input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--gold);
+}
+
+.smb-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.smb-browser {
+  margin-top: 14px;
+}
+
+.smb-path {
+  margin: 0 0 8px;
+  color: var(--gold);
+  font-size: 0.82rem;
+  word-break: break-all;
+}
+
+.smb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.smb-row {
+  display: grid;
+  grid-template-columns: 4.8rem 1fr auto;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.smb-row:hover,
+.smb-row[aria-pressed="true"] {
+  border-color: var(--gold);
+  background: rgba(232, 192, 122, 0.1);
+}
+
+.smb-kind {
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.smb-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.smb-extra {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.smb-empty {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.smb-form[inert] {
+  opacity: 0.55;
 }
 
 .mode-row button,
@@ -425,8 +541,17 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 @media (max-width: 720px) {
-  .film-grid {
+  .film-grid,
+  .smb-form {
     grid-template-columns: 1fr;
+  }
+
+  .smb-row {
+    grid-template-columns: 4.2rem 1fr;
+  }
+
+  .smb-extra {
+    grid-column: 2;
   }
 
   .hud-modes {

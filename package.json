@@ -1,16 +1,18 @@
 {
   "name": "cine-vr",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.6.0",
   "type": "module",
   "description": "Cinéma WebXR pour Meta Quest 2 — films 2D, 3D SBS, 180° et 360°.",
   "scripts": {
     "dev": "vite --host --port 43221",
     "dev:https": "HTTPS=1 vite --host --port 43221",
     "build": "tsc && vite build",
-    "preview": "vite preview --host --port 43221"
+    "preview": "vite preview --host --port 43221",
+    "preview:https": "HTTPS=1 vite preview --host --port 43221"
   },
   "dependencies": {
+    "@marsaud/smb2": "^0.18.0",
     "three": "^0.182.0"
   },
   "devDependencies": {

@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#07060c" />
     <meta name="description" content="Ciné VR — salle de cinéma WebXR pour Meta Quest 2. Films 2D, 3D SBS, 180° et 360°." />
-    <title>Ciné VR 0.5 — Quest 2</title>
+    <title>Ciné VR 0.6 — Quest 2</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -18,7 +18,7 @@
   <body data-stage="lobby">
     <canvas id="view"></canvas>
 
-    <p id="app-version" class="version-chip">v0.5</p>
+    <p id="app-version" class="version-chip">v0.6</p>
     <div id="lobby">
       <header class="masthead">
         <p class="kicker">Application vidéo · Meta Quest 2</p>
@@ -54,6 +54,56 @@
         </div>
         <p id="load-status" class="status" hidden>Chargement de la vidéo…</p>
         <p id="load-error" class="status error" hidden></p>
+      </section>
+
+      <section class="panel" aria-labelledby="smb-title">
+        <div class="panel-head">
+          <h2 id="smb-title">Disque réseau (SMB)</h2>
+          <p id="smb-note">Recherche du relais PC…</p>
+        </div>
+        <form id="smb-form" class="smb-form" autocomplete="on">
+          <label>
+            Serveur
+            <input id="smb-host" name="host" type="text" placeholder="192.168.1.20 ou demo" spellcheck="false" />
+          </label>
+          <label>
+            Partage
+            <input id="smb-share" name="share" type="text" placeholder="films" spellcheck="false" />
+          </label>
+          <label>
+            Identifiant
+            <input id="smb-username" name="username" type="text" placeholder="Guest" autocomplete="username" />
+          </label>
+          <label>
+            Mot de passe
+            <input id="smb-password" name="password" type="password" autocomplete="current-password" />
+          </label>
+          <label>
+            Domaine
+            <input id="smb-domain" name="domain" type="text" placeholder="WORKGROUP" spellcheck="false" />
+          </label>
+          <label>
+            Port
+            <input id="smb-port" name="port" type="number" inputmode="numeric" value="445" min="1" max="65535" />
+          </label>
+          <label class="smb-folder">
+            Dossier de départ
+            <input id="smb-folder" name="folder" type="text" placeholder="optionnel, ex. vr/2024" spellcheck="false" />
+          </label>
+          <label class="smb-remember">
+            <input id="smb-remember" type="checkbox" checked />
+            Mémoriser sur cet appareil (y compris le mot de passe)
+          </label>
+          <div class="smb-actions">
+            <button id="smb-connect" type="submit" class="ghost">Connecter</button>
+            <button id="smb-disconnect" type="button" class="ghost" hidden>Déconnecter</button>
+          </div>
+        </form>
+        <p id="smb-status" class="status" hidden></p>
+        <div id="smb-browser" class="smb-browser" hidden>
+          <p id="smb-path" class="smb-path"></p>
+          <div id="smb-list" class="smb-list"></div>
+        </div>
       </section>
 
       <section class="panel" aria-labelledby="mode-title">
@@ -96,6 +146,11 @@
             Visez le panneau doré avec le rayon, validez avec la <strong>gâchette</strong>.
             Bouton A : lecture. Bouton B : masquer le panneau.
           </li>
+          <li>
+            Pour un NAS (SMB) : lancez <code>npm run dev:https</code> sur le PC,
+            ouvrez cette adresse dans le Quest, puis remplissez <strong>Disque réseau</strong>.
+            GitHub Pages ne peut pas parler SMB.
+          </li>
         </ol>
       </section>
     </div>
@@ -105,7 +160,7 @@
         <button id="hud-lobby" type="button">Lobby</button>
         <button id="hud-play" type="button">Lecture</button>
         <p id="hud-title">Ciné VR</p>
-        <p id="hud-version" class="hud-version">v0.5</p>
+        <p id="hud-version" class="hud-version">v0.6</p>
         <input id="hud-seek" type="range" min="0" max="1000" value="0" aria-label="Position" />
         <p id="hud-time">0:00 / 0:00</p>
         <button id="hud-mute" type="button">Muet</button>
