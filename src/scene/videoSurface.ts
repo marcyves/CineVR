@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { ViewMode } from "../types.ts";
 import { TitleSlate } from "./slate.ts";
 
+const PANO_RADIUS = 40;
+
 export class VideoSurface {
   readonly group = new THREE.Group();
   readonly cinemaScreen: THREE.Mesh;
@@ -11,10 +13,13 @@ export class VideoSurface {
   readonly slateTexture: THREE.CanvasTexture;
   readonly videoTexture: THREE.VideoTexture;
 
-  private videoMaterial: THREE.MeshBasicMaterial;
-  private slateMaterial: THREE.MeshBasicMaterial;
+  private screenSlateMaterial: THREE.MeshBasicMaterial;
+  private screenVideoMaterial: THREE.MeshBasicMaterial;
+  private panoSlateMaterial: THREE.MeshBasicMaterial;
+  private panoVideoMaterial: THREE.MeshBasicMaterial;
   private mode: ViewMode = ViewMode.Cinema;
   private showingVideo = false;
+  private anchor = new THREE.Vector3();
 
   constructor(video: HTMLVideoElement) {
     this.slate = new TitleSlate();
@@ -25,31 +30,52 @@ export class VideoSurface {
     this.videoTexture.colorSpace = THREE.SRGBColorSpace;
     this.videoTexture.minFilter = THREE.LinearFilter;
     this.videoTexture.magFilter = THREE.LinearFilter;
+    this.videoTexture.generateMipmaps = false;
     this.videoTexture.wrapS = THREE.ClampToEdgeWrapping;
     this.videoTexture.wrapT = THREE.ClampToEdgeWrapping;
 
-    this.slateMaterial = new THREE.MeshBasicMaterial({ map: this.slateTexture });
-    this.videoMaterial = new THREE.MeshBasicMaterial({ map: this.videoTexture });
+    this.screenSlateMaterial = new THREE.MeshBasicMaterial({
+      map: this.slateTexture,
+    });
+    this.screenVideoMaterial = new THREE.MeshBasicMaterial({
+      map: this.videoTexture,
+    });
+    this.panoSlateMaterial = new THREE.MeshBasicMaterial({
+      map: this.slateTexture,
+      toneMapped: false,
+      depthWrite: false,
+    });
+    this.panoVideoMaterial = new THREE.MeshBasicMaterial({
+      map: this.videoTexture,
+      toneMapped: false,
+      depthWrite: false,
+    });
 
     this.cinemaScreen = new THREE.Mesh(
       new THREE.PlaneGeometry(9.6, 5.4),
-      this.slateMaterial,
+      this.screenSlateMaterial,
     );
     this.cinemaScreen.position.set(0, 2.75, -8.82);
     this.cinemaScreen.name = "screen";
 
-    this.sphere = new THREE.Mesh(
-      new THREE.SphereGeometry(18, 64, 40),
-      this.slateMaterial,
-    );
-    this.sphere.scale.x = -1;
+    const sphereGeom = new THREE.SphereGeometry(PANO_RADIUS, 64, 40);
+    sphereGeom.scale(-1, 1, 1);
+    this.sphere = new THREE.Mesh(sphereGeom, this.panoSlateMaterial);
+    this.sphere.frustumCulled = false;
+    this.sphere.renderOrder = -1000;
     this.sphere.visible = false;
 
-    this.hemi = new THREE.Mesh(
-      new THREE.SphereGeometry(18, 48, 32, Math.PI / 2, Math.PI),
-      this.slateMaterial,
+    const hemiGeom = new THREE.SphereGeometry(
+      PANO_RADIUS,
+      48,
+      32,
+      Math.PI / 2,
+      Math.PI,
     );
-    this.hemi.scale.x = -1;
+    hemiGeom.scale(-1, 1, 1);
+    this.hemi = new THREE.Mesh(hemiGeom, this.panoSlateMaterial);
+    this.hemi.frustumCulled = false;
+    this.hemi.renderOrder = -1000;
     this.hemi.visible = false;
 
     this.group.add(this.cinemaScreen, this.sphere, this.hemi);
@@ -95,6 +121,14 @@ export class VideoSurface {
     this.applyMaterial();
   }
 
+  /** Keep the panorama around the headset so 360 never becomes a void. */
+  follow(camera: THREE.Camera): void {
+    if (this.mode !== ViewMode.Sphere && this.mode !== ViewMode.Half) return;
+    camera.getWorldPosition(this.anchor);
+    this.sphere.position.copy(this.anchor);
+    this.hemi.position.copy(this.anchor);
+  }
+
   updateSlate(timeMs: number, title: string, subtitle: string, status: string): void {
     if (this.showingVideo) return;
     this.slate.draw(timeMs, title, subtitle, status);
@@ -102,10 +136,19 @@ export class VideoSurface {
   }
 
   private applyMaterial(): void {
-    const material = this.showingVideo ? this.videoMaterial : this.slateMaterial;
-    this.cinemaScreen.material = material;
-    this.sphere.material = material;
-    this.hemi.material = material;
+    const pano = this.mode === ViewMode.Sphere || this.mode === ViewMode.Half;
+    if (pano) {
+      const material = this.showingVideo
+        ? this.panoVideoMaterial
+        : this.panoSlateMaterial;
+      this.sphere.material = material;
+      this.hemi.material = material;
+    } else {
+      const material = this.showingVideo
+        ? this.screenVideoMaterial
+        : this.screenSlateMaterial;
+      this.cinemaScreen.material = material;
+    }
 
     if (this.showingVideo && this.mode === ViewMode.Sbs) {
       this.videoTexture.repeat.set(0.5, 1);
