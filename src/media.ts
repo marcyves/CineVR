@@ -35,6 +35,7 @@ export class MediaPlayer {
     document.body.append(video);
 
     video.addEventListener("loadstart", () => {
+      if (this.status === "ready") return;
       if (this.status !== "error") this.setStatus("loading");
     });
     video.addEventListener("loadeddata", () => this.setStatus("ready"));
@@ -187,6 +188,7 @@ export class MediaPlayer {
   }
 
   private setStatus(status: MediaStatus): void {
+    if (this.status === status) return;
     this.status = status;
     this.emit();
   }

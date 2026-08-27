@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { APP_VERSION } from "../version.ts";
 import { formatTimecode, type MediaPlayer } from "../media.ts";
 import { ViewMode } from "../types.ts";
 
@@ -72,7 +73,7 @@ export class SpatialPanel {
     ctx.fillStyle = "#e8c07a";
     ctx.font = "600 22px 'DM Sans', sans-serif";
     ctx.textAlign = "left";
-    ctx.fillText("CINÉ VR", 36, 46);
+    ctx.fillText(`CINÉ VR  ·  ${APP_VERSION}`, 36, 46);
     ctx.fillStyle = "rgba(246, 241, 230, 0.7)";
     ctx.font = "500 20px 'DM Sans', sans-serif";
     ctx.textAlign = "right";
