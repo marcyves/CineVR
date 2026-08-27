@@ -41,12 +41,12 @@ export const catalog: VideoItem[] = [
   },
   {
     id: "sphere",
-    title: "Nébuleuse 360°",
+    title: "Ciel 360°",
     director: "Ciné VR",
     duration: "12 s",
     year: "2026",
     synopsis:
-      "Ciel equirectangulaire pour le mode Sphère. Tournez la tête : l’image vous entoure.",
+      "Ciel equirectangulaire avec horizon. En mode Sphère, tournez la tête : le bleu est au zénith, l’or à l’horizon.",
     src: assetUrl("videos/sphere-360.mp4"),
     kind: "360",
     posterHue: 265,
