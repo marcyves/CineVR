@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#07060c" />
+    <meta name="description" content="Ciné VR — salle de cinéma WebXR pour Meta Quest 2. Films 2D, 3D SBS, 180° et 360°." />
+    <title>Ciné VR — Quest 2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body data-stage="lobby">
+    <canvas id="view"></canvas>
+
+    <div id="lobby">
+      <header class="masthead">
+        <p class="kicker">Application vidéo · Meta Quest 2</p>
+        <h1>Ciné VR</h1>
+        <p class="lede">
+          Une salle privée dans le casque. Grand écran 16:9, projection 3D côte-à-côte,
+          dôme 180° ou sphère 360°. Manettes Touch, gâchette, stick.
+        </p>
+        <p id="headset-badge" class="badge" data-state="desktop">Vérification du casque…</p>
+      </header>
+
+      <section class="panel" aria-labelledby="films-title">
+        <div class="panel-head">
+          <h2 id="films-title">Programme</h2>
+          <p>Courts métrages libres de droits, encodés H.264 — le codec le plus fiable sur Quest 2.</p>
+        </div>
+        <div id="film-grid" class="film-grid"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="custom-title">
+        <div class="panel-head">
+          <h2 id="custom-title">Votre copie</h2>
+          <p>
+            Importez un fichier depuis le casque ou collez l’URL d’un MP4.
+            Pour le 360°, choisissez le mode Sphère après le chargement.
+          </p>
+        </div>
+        <div class="custom-row">
+          <input id="video-file" type="file" accept="video/mp4,video/webm,video/*" hidden />
+          <button id="pick-file" type="button" class="ghost">Choisir un fichier</button>
+          <input id="video-url" type="url" placeholder="https://exemple.com/film.mp4" autocomplete="off" />
+          <button id="load-url" type="button" class="ghost">Charger l’URL</button>
+        </div>
+        <p id="load-status" class="status" hidden>Chargement de la vidéo…</p>
+        <p id="load-error" class="status error" hidden></p>
+      </section>
+
+      <section class="panel" aria-labelledby="mode-title">
+        <div class="panel-head">
+          <h2 id="mode-title">Projection</h2>
+          <p id="mode-help"></p>
+        </div>
+        <div class="mode-row">
+          <button type="button" data-mode="cinema" aria-pressed="true">Cinéma</button>
+          <button type="button" data-mode="sbs" aria-pressed="false">3D SBS</button>
+          <button type="button" data-mode="180" aria-pressed="false">180°</button>
+          <button type="button" data-mode="360" aria-pressed="false">360°</button>
+        </div>
+      </section>
+
+      <div class="cta-row">
+        <button id="enter-vr" type="button" class="primary">Entrer en VR</button>
+        <button id="preview" type="button" class="ghost">Prévisualiser la salle</button>
+      </div>
+
+      <section class="howto">
+        <h2>Sur Quest 2</h2>
+        <ol>
+          <li>Ouvrez le <strong>navigateur Meta Quest</strong> (pas l’application TV).</li>
+          <li>Entrez l’adresse HTTPS de cette page, ou ajoutez-la à vos applications (PWA).</li>
+          <li>Choisissez un film et un mode, puis appuyez sur <strong>Entrer en VR</strong>.</li>
+          <li>
+            Visez le panneau doré avec le rayon, validez avec la <strong>gâchette</strong>.
+            Bouton A : lecture. Bouton B : masquer le panneau. Stick : avance / volume.
+          </li>
+        </ol>
+      </section>
+    </div>
+
+    <div id="hud" hidden>
+      <div class="hud-bar">
+        <button id="hud-lobby" type="button">Lobby</button>
+        <button id="hud-play" type="button">Lecture</button>
+        <p id="hud-title">Ciné VR</p>
+        <input id="hud-seek" type="range" min="0" max="1000" value="0" aria-label="Position" />
+        <p id="hud-time">0:00 / 0:00</p>
+        <button id="hud-mute" type="button">Muet</button>
+        <input id="hud-volume" type="range" min="0" max="100" value="100" aria-label="Volume" />
+        <div class="hud-modes">
+          <button type="button" data-mode="cinema">Cinéma</button>
+          <button type="button" data-mode="sbs">SBS</button>
+          <button type="button" data-mode="180">180</button>
+          <button type="button" data-mode="360">360</button>
+        </div>
+      </div>
+      <p class="hud-hint">Glisser pour regarder · Espace lecture · Échap lobby · 1–4 modes</p>
+    </div>
+
+    <div id="toast" role="status"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
