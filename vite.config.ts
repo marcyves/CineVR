@@ -1,5 +1,6 @@
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import { defineConfig } from "vite";
+import { smbGateway } from "./server/smbGateway.ts";
 
 const https = process.env.HTTPS === "1";
 
@@ -11,7 +12,7 @@ function pagesBase(): string {
 
 export default defineConfig({
   base: pagesBase(),
-  plugins: https ? [basicSsl()] : [],
+  plugins: [...(https ? [basicSsl()] : []), smbGateway()],
   server: {
     host: true,
     port: 43221,

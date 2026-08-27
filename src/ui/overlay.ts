@@ -2,11 +2,13 @@ import { APP_VERSION } from "../version.ts";
 import { catalog, viewModeHelp } from "../catalog.ts";
 import type { MediaPlayer } from "../media.ts";
 import { formatTimecode } from "../media.ts";
+import { SmbPanel } from "../smb/panel.ts";
 import { ViewMode, type VideoItem } from "../types.ts";
 
 export type OverlayHandlers = {
   onSelectVideo: (item: VideoItem) => void;
   onCustomUrl: (url: string) => void;
+  onSmbPlay: (url: string, title: string) => void;
   onCustomFile: (file: File) => void;
   onMode: (mode: ViewMode) => void;
   onEnterVr: () => void;
@@ -38,14 +40,21 @@ export class Overlay {
   mode: ViewMode = ViewMode.Cinema;
   private toastTimer = 0;
   private handlers: OverlayHandlers;
+  private smb: SmbPanel;
 
   constructor(handlers: OverlayHandlers) {
     this.handlers = handlers;
+    this.smb = new SmbPanel({
+      onPlay: (url, title) => this.handlers.onSmbPlay(url, title),
+      notify: (message) => this.notify(message),
+      setSelected: (id) => this.setSelected(id),
+    });
     this.renderCatalog();
     this.bind();
     this.setMode(ViewMode.Cinema);
     this.fillQuestAddress();
     this.fillVersion();
+    void this.smb.init();
   }
 
   showLobby(): void {
@@ -95,6 +104,7 @@ export class Overlay {
     for (const card of this.lobby.querySelectorAll<HTMLButtonElement>(".film-card")) {
       card.setAttribute("aria-pressed", String(card.dataset.id === id));
     }
+    this.smb.markSelected(id);
   }
 
   syncPlayer(player: MediaPlayer): void {
