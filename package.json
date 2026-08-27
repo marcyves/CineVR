@@ -1,7 +1,7 @@
 {
   "name": "cine-vr",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.4.0",
   "type": "module",
   "description": "Cinéma WebXR pour Meta Quest 2 — films 2D, 3D SBS, 180° et 360°.",
   "scripts": {

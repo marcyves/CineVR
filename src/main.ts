@@ -279,5 +279,6 @@ renderer.setAnimationLoop(() => {
     overlay.syncPlayer(player);
     hudAge = 0;
   }
+  surface.commitFrame();
   renderer.render(scene, camera);
 });

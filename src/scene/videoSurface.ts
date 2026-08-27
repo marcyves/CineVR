@@ -19,6 +19,7 @@ export class VideoSurface {
   private panoVideoMaterial: THREE.MeshBasicMaterial;
   private mode: ViewMode = ViewMode.Cinema;
   private showingVideo = false;
+  private frameDirty = true;
 
   constructor(video: HTMLVideoElement) {
     this.slate = new TitleSlate();
@@ -32,6 +33,19 @@ export class VideoSurface {
     this.videoTexture.generateMipmaps = false;
     this.videoTexture.wrapS = THREE.ClampToEdgeWrapping;
     this.videoTexture.wrapT = THREE.ClampToEdgeWrapping;
+    this.videoTexture.update = () => {
+      /* Uploaded once per animation frame in commitFrame() so both XR eyes share the same picture. */
+    };
+
+    const onVideoFrame = () => {
+      this.frameDirty = true;
+      if ("requestVideoFrameCallback" in video) {
+        video.requestVideoFrameCallback(onVideoFrame);
+      }
+    };
+    if ("requestVideoFrameCallback" in video) {
+      video.requestVideoFrameCallback(onVideoFrame);
+    }
 
     this.screenSlateMaterial = new THREE.MeshBasicMaterial({
       map: this.slateTexture,
@@ -118,8 +132,18 @@ export class VideoSurface {
   }
 
   showVideo(show: boolean): void {
+    if (this.showingVideo === show) return;
     this.showingVideo = show;
     this.applyMaterial();
+  }
+
+  /** Call once per animation frame, before renderer.render. */
+  commitFrame(): void {
+    const video = this.videoTexture.source.data as HTMLVideoElement;
+    if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
+    if ("requestVideoFrameCallback" in video && !this.frameDirty) return;
+    this.videoTexture.needsUpdate = true;
+    this.frameDirty = false;
   }
 
   updateSlate(timeMs: number, title: string, subtitle: string, status: string): void {

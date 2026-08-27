@@ -1,3 +1,4 @@
+import { APP_VERSION } from "../version.ts";
 import { catalog, viewModeHelp } from "../catalog.ts";
 import type { MediaPlayer } from "../media.ts";
 import { formatTimecode } from "../media.ts";
@@ -44,6 +45,7 @@ export class Overlay {
     this.bind();
     this.setMode(ViewMode.Cinema);
     this.fillQuestAddress();
+    this.fillVersion();
   }
 
   showLobby(): void {
@@ -124,6 +126,15 @@ export class Overlay {
     this.toastTimer = window.setTimeout(() => {
       this.toast.dataset.show = "false";
     }, 3200);
+  }
+
+  private fillVersion(): void {
+    const label = `v${APP_VERSION}`;
+    const chip = document.querySelector("#app-version");
+    const hud = document.querySelector("#hud-version");
+    if (chip) chip.textContent = label;
+    if (hud) hud.textContent = label;
+    document.title = `Ciné VR ${label} — Quest 2`;
   }
 
   private fillQuestAddress(): void {
