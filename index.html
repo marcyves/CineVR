@@ -75,13 +75,26 @@
 
       <section class="howto">
         <h2>Sur Quest 2</h2>
+        <p id="quest-address" class="quest-address"></p>
         <ol>
-          <li>Ouvrez le <strong>navigateur Meta Quest</strong> (pas l’application TV).</li>
-          <li>Entrez l’adresse HTTPS de cette page, ou ajoutez-la à vos applications (PWA).</li>
-          <li>Choisissez un film et un mode, puis appuyez sur <strong>Entrer en VR</strong>.</li>
           <li>
-            Visez le panneau doré avec le rayon, validez avec la <strong>gâchette</strong>.
-            Bouton A : lecture. Bouton B : masquer le panneau. Stick : avance / volume.
+            Le bouton Preview de Cursor ne s’ouvre <strong>pas</strong> dans le casque.
+            Il faut une adresse <strong>HTTPS</strong> que le Quest peut joindre (votre PC
+            en Wi‑Fi, ou un site déployé).
+          </li>
+          <li>
+            Sur l’ordinateur, dans ce projet : <code>npm run dev:https</code>.
+            PC et casque sur le <strong>même Wi‑Fi</strong>. Notez l’IP réseau affichée
+            (ex. <code>https://192.168.1.20:43221</code>).
+          </li>
+          <li>
+            Dans le casque, ouvrez l’app <strong>Navigateur</strong> (icône globe dans la
+            bibliothèque — pas TV, pas YouTube). Tapez cette adresse.
+          </li>
+          <li>
+            Si un avertissement de certificat apparaît, continuez quand même (certificat
+            local). Choisissez un film, puis <strong>Entrer en VR</strong>. Autorisez la
+            session immersive.
           </li>
         </ol>
       </section>

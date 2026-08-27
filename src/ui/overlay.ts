@@ -43,6 +43,7 @@ export class Overlay {
     this.renderCatalog();
     this.bind();
     this.setMode(ViewMode.Cinema);
+    this.fillQuestAddress();
   }
 
   showLobby(): void {
@@ -123,6 +124,16 @@ export class Overlay {
     this.toastTimer = window.setTimeout(() => {
       this.toast.dataset.show = "false";
     }, 3200);
+  }
+
+  private fillQuestAddress(): void {
+    const node = document.querySelector<HTMLElement>("#quest-address");
+    if (!node) return;
+    const href = window.location.href;
+    const secure = window.isSecureContext;
+    node.textContent = secure
+      ? `Adresse actuelle : ${href} — ouvrez-la dans le navigateur du Quest.`
+      : `Cette page est en HTTP. WebXR sur Quest exige HTTPS : lancez npm run dev:https sur votre PC, ou déployez le site.`;
   }
 
   private renderCatalog(): void {

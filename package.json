@@ -6,6 +6,7 @@
   "description": "Cinéma WebXR pour Meta Quest 2 — films 2D, 3D SBS, 180° et 360°.",
   "scripts": {
     "dev": "vite --host --port 43221",
+    "dev:https": "HTTPS=1 vite --host --port 43221",
     "build": "tsc && vite build",
     "preview": "vite preview --host --port 43221"
   },
@@ -15,6 +16,7 @@
   "devDependencies": {
     "@types/three": "^0.185.4",
     "@types/webxr": "^0.5.24",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
     "typescript": "~6.0.2",
     "vite": "^8.2.2"
   }
