@@ -2,8 +2,8 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#07060c" />
     <meta name="description" content="Ciné VR — salle de cinéma WebXR pour Meta Quest 2. Films 2D, 3D SBS, 180° et 360°." />
@@ -78,23 +78,22 @@
         <p id="quest-address" class="quest-address"></p>
         <ol>
           <li>
-            Le bouton Preview de Cursor ne s’ouvre <strong>pas</strong> dans le casque.
-            Il faut une adresse <strong>HTTPS</strong> que le Quest peut joindre (votre PC
-            en Wi‑Fi, ou un site déployé).
+            Le plus simple : publiez sur <strong>GitHub Pages</strong> (HTTPS inclus).
+            Dans le casque, ouvrez le <strong>Navigateur</strong> (icône globe) et allez
+            sur <code>https://votre-compte.github.io/nom-du-repo/</code>.
           </li>
           <li>
-            Sur l’ordinateur, dans ce projet : <code>npm run dev:https</code>.
-            PC et casque sur le <strong>même Wi‑Fi</strong>. Notez l’IP réseau affichée
-            (ex. <code>https://192.168.1.20:43221</code>).
+            Ou, en local : <code>npm run dev:https</code>, même Wi‑Fi, puis l’IP
+            affichée (ex. <code>https://192.168.1.20:43221</code>). Acceptez le
+            certificat local.
           </li>
           <li>
-            Dans le casque, ouvrez l’app <strong>Navigateur</strong> (icône globe dans la
-            bibliothèque — pas TV, pas YouTube). Tapez cette adresse.
+            Le badge doit indiquer <strong>Quest détecté</strong>. Choisissez un film,
+            puis <strong>Entrer en VR</strong>. Autorisez la session immersive.
           </li>
           <li>
-            Si un avertissement de certificat apparaît, continuez quand même (certificat
-            local). Choisissez un film, puis <strong>Entrer en VR</strong>. Autorisez la
-            session immersive.
+            Visez le panneau doré avec le rayon, validez avec la <strong>gâchette</strong>.
+            Bouton A : lecture. Bouton B : masquer le panneau.
           </li>
         </ol>
       </section>

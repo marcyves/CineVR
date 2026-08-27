@@ -1,3 +1,4 @@
+import { assetUrl } from "./assetUrl.ts";
 import type { VideoItem } from "./types.ts";
 
 /** Copies locales H.264 — lisibles hors-ligne et sans CORS sur Quest 2. */
@@ -10,7 +11,7 @@ export const catalog: VideoItem[] = [
     year: "2026",
     synopsis:
       "Générique de la salle. Un bon premier test d’écran, de velours et de cadrage 16:9.",
-    src: "/videos/trailer.mp4",
+    src: assetUrl("videos/trailer.mp4"),
     kind: "flat",
     posterHue: 38,
   },
@@ -22,7 +23,7 @@ export const catalog: VideoItem[] = [
     year: "2008",
     synopsis:
       "Extrait du court métrage : un lapin trop gentil et des rongeurs insupportables. Boucle H.264 720p.",
-    src: "/videos/big-buck-bunny.mp4",
+    src: assetUrl("videos/big-buck-bunny.mp4"),
     kind: "flat",
     posterHue: 32,
   },
@@ -34,7 +35,7 @@ export const catalog: VideoItem[] = [
     year: "2010",
     synopsis:
       "Bande-annonce officielle. Une jeune femme poursuit un dragon — très lisible en grand écran VR.",
-    src: "/videos/sintel.mp4",
+    src: assetUrl("videos/sintel.mp4"),
     kind: "flat",
     posterHue: 200,
   },
@@ -46,7 +47,7 @@ export const catalog: VideoItem[] = [
     year: "2026",
     synopsis:
       "Ciel equirectangulaire pour le mode Sphère. Tournez la tête : l’image vous entoure.",
-    src: "/videos/sphere-360.mp4",
+    src: assetUrl("videos/sphere-360.mp4"),
     kind: "360",
     posterHue: 265,
   },

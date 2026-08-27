@@ -4,6 +4,18 @@ Application vidéo pour **Meta Quest 2** : une salle de cinéma WebXR dans le na
 
 Ce n’est pas une APK Unity. C’est une page web immersive. Le bouton Preview de Cursor s’ouvre sur l’ordinateur, pas dans le casque.
 
+## Publier sur GitHub Pages
+
+C’est le moyen le plus simple d’ouvrir Ciné VR dans le Quest 2 : GitHub Pages sert du **HTTPS**, obligatoire pour WebXR.
+
+1. Poussez le projet sur GitHub (dépôt public ou privé avec Pages).
+2. Dans le dépôt : **Settings → Pages → Build and deployment → Source : GitHub Actions**.
+3. Le workflow `.github/workflows/pages.yml` construit le site à chaque push sur `main`.
+4. L’URL sera `https://<compte>.github.io/<repo>/` (ou `https://<compte>.github.io/` si le dépôt s’appelle `<compte>.github.io`).
+5. Dans le navigateur du Quest, ouvrez cette URL, puis **Entrer en VR**.
+
+Le `base` Vite est calculé automatiquement pour les sites en sous-chemin (`/nom-du-repo/`).
+
 ## Lancer en local (ordinateur)
 
 ```bash
@@ -32,15 +44,9 @@ WebXR n’est autorisé que sur **HTTPS** (ou `localhost`, inutile dans le casqu
 6. Le badge doit indiquer **Quest détecté**. Choisissez un film, puis **Entrer en VR**. Acceptez la session immersive.
 7. Restez assis. Visez le panneau doré avec le rayon, validez avec la **gâchette**.
 
-### Option B — site HTTPS public
+### Option B — GitHub Pages ou autre hébergeur HTTPS
 
-```bash
-npm run build
-```
-
-Déposez le dossier `dist` sur n’importe quel hébergeur statique (Netlify, Cloudflare Pages, Vercel). Dans le navigateur du Quest, ouvrez l’URL `https://…` fournie, puis **Entrer en VR**.
-
-Menu du navigateur Quest → **Ajouter à vos applications** pour la retrouver comme une app.
+GitHub Pages : voir plus haut. Autre hébergeur : `npm run build`, puis publiez le dossier `dist`.
 
 ## Dans le casque
 

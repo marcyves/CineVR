@@ -2,14 +2,15 @@
   "name": "Ciné VR",
   "short_name": "Ciné VR",
   "description": "Salle de cinéma WebXR pour Meta Quest 2",
-  "start_url": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "fullscreen",
   "background_color": "#07060c",
   "theme_color": "#07060c",
   "lang": "fr",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "./favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }
