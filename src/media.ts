@@ -2,6 +2,11 @@ export type MediaStatus = "idle" | "loading" | "ready" | "error";
 
 type MediaListener = () => void;
 
+const MEDIA_ERR_ABORTED = 1;
+const MEDIA_ERR_NETWORK = 2;
+const MEDIA_ERR_DECODE = 3;
+const MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
+
 export class MediaPlayer {
   readonly video: HTMLVideoElement;
   status: MediaStatus = "idle";
@@ -10,6 +15,7 @@ export class MediaPlayer {
 
   private listeners = new Set<MediaListener>();
   private objectUrl: string | null = null;
+  private loadId = 0;
 
   constructor() {
     const video = document.createElement("video");
@@ -17,16 +23,28 @@ export class MediaPlayer {
     video.preload = "auto";
     video.loop = true;
     video.controls = false;
+    video.muted = true;
     video.setAttribute("webkit-playsinline", "true");
-    video.addEventListener("loadstart", () => this.setStatus("loading"));
+    video.setAttribute("playsinline", "true");
+    video.style.position = "fixed";
+    video.style.width = "1px";
+    video.style.height = "1px";
+    video.style.opacity = "0";
+    video.style.pointerEvents = "none";
+    video.setAttribute("aria-hidden", "true");
+    document.body.append(video);
+
+    video.addEventListener("loadstart", () => {
+      if (this.status !== "error") this.setStatus("loading");
+    });
+    video.addEventListener("loadeddata", () => this.setStatus("ready"));
     video.addEventListener("canplay", () => this.setStatus("ready"));
     video.addEventListener("playing", () => this.setStatus("ready"));
     video.addEventListener("error", () => {
-      const code = video.error?.code;
-      this.errorMessage =
-        code === 4
-          ? "Ce format n’est pas lisible sur Quest 2. Préférez un MP4 H.264."
-          : "Impossible de charger la vidéo. Vérifiez l’URL, le réseau ou le fichier.";
+      if (!video.src) return;
+      const code = video.error?.code ?? 0;
+      if (code === MEDIA_ERR_ABORTED) return;
+      this.errorMessage = messageForError(code);
       this.setStatus("error");
     });
     this.video = video;
@@ -55,31 +73,34 @@ export class MediaPlayer {
   }
 
   async loadUrl(src: string, label: string, remote: boolean): Promise<void> {
+    const id = ++this.loadId;
     this.revokeObjectUrl();
     this.sourceLabel = label;
     this.errorMessage = "";
-    this.video.crossOrigin = remote ? "anonymous" : "";
+    if (remote) this.video.crossOrigin = "anonymous";
+    else this.video.removeAttribute("crossorigin");
+    this.setStatus("loading");
+    this.video.pause();
     this.video.src = src;
     this.video.load();
-    this.setStatus("loading");
-    this.emit();
+    await this.waitUntilSettled(id);
   }
 
   async loadFile(file: File): Promise<void> {
+    const id = ++this.loadId;
     this.revokeObjectUrl();
     this.objectUrl = URL.createObjectURL(file);
     this.sourceLabel = file.name;
     this.errorMessage = "";
-    this.video.crossOrigin = "";
+    this.video.removeAttribute("crossorigin");
+    this.setStatus("loading");
     this.video.src = this.objectUrl;
     this.video.load();
-    this.setStatus("loading");
-    this.emit();
+    await this.waitUntilSettled(id);
   }
 
   async play(): Promise<void> {
     try {
-      this.video.muted = false;
       await this.video.play();
     } catch {
       this.video.muted = true;
@@ -115,7 +136,7 @@ export class MediaPlayer {
 
   setVolume(volume: number): void {
     this.video.volume = Math.min(Math.max(volume, 0), 1);
-    this.video.muted = this.video.volume === 0;
+    if (this.video.volume > 0) this.video.muted = false;
     this.emit();
   }
 
@@ -126,6 +147,43 @@ export class MediaPlayer {
   toggleMute(): void {
     this.video.muted = !this.video.muted;
     this.emit();
+  }
+
+  unmute(): void {
+    this.video.muted = false;
+    this.emit();
+  }
+
+  private waitUntilSettled(id: number): Promise<void> {
+    return new Promise((resolve) => {
+      const video = this.video;
+      const finish = () => {
+        video.removeEventListener("canplay", onOk);
+        video.removeEventListener("loadeddata", onOk);
+        video.removeEventListener("error", onErr);
+        resolve();
+      };
+      const onOk = () => {
+        if (id !== this.loadId) return;
+        this.setStatus("ready");
+        finish();
+      };
+      const onErr = () => {
+        if (id !== this.loadId) return;
+        const code = video.error?.code ?? 0;
+        if (code === MEDIA_ERR_ABORTED) return;
+        this.errorMessage = messageForError(code);
+        this.setStatus("error");
+        finish();
+      };
+      video.addEventListener("canplay", onOk, { once: true });
+      video.addEventListener("loadeddata", onOk, { once: true });
+      video.addEventListener("error", onErr, { once: true });
+      window.setTimeout(() => {
+        if (id !== this.loadId) return;
+        if (this.status === "loading") finish();
+      }, 8000);
+    });
   }
 
   private setStatus(status: MediaStatus): void {
@@ -143,6 +201,19 @@ export class MediaPlayer {
       this.objectUrl = null;
     }
   }
+}
+
+function messageForError(code: number): string {
+  if (code === MEDIA_ERR_NETWORK) {
+    return "Réseau coupé pendant le chargement. Réessayez ou importez un fichier.";
+  }
+  if (code === MEDIA_ERR_DECODE) {
+    return "Le fichier est endommagé ou trop lourd pour le décodeur du casque.";
+  }
+  if (code === MEDIA_ERR_SRC_NOT_SUPPORTED) {
+    return "Fichier illisible. Sur Quest 2, utilisez un MP4 H.264 (ou un WebM).";
+  }
+  return "Impossible de charger la vidéo. Vérifiez l’URL, le réseau ou le fichier.";
 }
 
 export function formatTimecode(seconds: number): string {

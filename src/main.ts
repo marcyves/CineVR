@@ -79,6 +79,9 @@ const overlay = new Overlay({
 player.onChange(() => {
   overlay.syncPlayer(player);
   surface.showVideo(player.status === "ready");
+  if (player.status === "ready" && stage === "lobby" && player.paused) {
+    void player.play();
+  }
 });
 
 void loadItem(catalog[0]);
@@ -131,6 +134,7 @@ async function enterVr(): Promise<void> {
     stage = "xr";
     panel.setVisible(true);
     overlay.hideChrome();
+    player.unmute();
     await player.play();
     overlay.notify("Visez le panneau avec la gâchette.");
     session.addEventListener("end", () => {
@@ -147,6 +151,15 @@ async function enterVr(): Promise<void> {
 function enterPreview(): void {
   stage = "preview";
   overlay.showHud();
+  const selected = catalog.find((item) => item.id === overlay.selectedId);
+  if (player.status === "error" && selected) {
+    void loadItem(selected).then(() => {
+      player.unmute();
+      void player.play();
+    });
+    return;
+  }
+  player.unmute();
   void player.play();
 }
 
