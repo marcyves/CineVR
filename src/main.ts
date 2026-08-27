@@ -95,6 +95,7 @@ function setMode(mode: ViewMode): void {
   lights.visible = !hideRoom;
   scene.fog = hideRoom ? null : new THREE.Fog(0x07060c, 12, 24);
   scene.background = new THREE.Color(hideRoom ? 0x102038 : 0x07060c);
+  renderer.xr.setFoveation(hideRoom ? 0 : 0.75);
 }
 
 async function loadItem(item: VideoItem): Promise<void> {
@@ -252,12 +253,6 @@ renderer.setAnimationLoop(() => {
   } else if (!renderer.xr.isPresenting) {
     camera.position.set(0, 1.28, 0.2);
     camera.rotation.set(pitch, yaw, 0, "YXZ");
-  }
-
-  if (renderer.xr.isPresenting) {
-    surface.follow(renderer.xr.getCamera());
-  } else {
-    surface.follow(camera);
   }
 
   if (renderer.xr.isPresenting) {
