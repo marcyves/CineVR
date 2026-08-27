@@ -24,15 +24,19 @@ export class MediaPlayer {
     video.loop = true;
     video.controls = false;
     video.muted = true;
+    video.disablePictureInPicture = true;
+    video.disableRemotePlayback = true;
     video.setAttribute("webkit-playsinline", "true");
     video.setAttribute("playsinline", "true");
-    video.style.position = "fixed";
-    video.style.width = "1px";
-    video.style.height = "1px";
-    video.style.opacity = "0";
-    video.style.pointerEvents = "none";
+    video.setAttribute("disablepictureinpicture", "");
+    video.setAttribute("controlslist", "nodownload nofullscreen noremoteplayback");
     video.setAttribute("aria-hidden", "true");
-    document.body.append(video);
+
+    const sink = document.createElement("div");
+    sink.className = "video-sink";
+    sink.setAttribute("aria-hidden", "true");
+    sink.append(video);
+    document.body.append(sink);
 
     video.addEventListener("loadstart", () => {
       if (this.status === "ready") return;
