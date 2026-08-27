@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { ViewMode } from "../types.ts";
 import { TitleSlate } from "./slate.ts";
 
-const PANO_RADIUS = 40;
+const PANO_RADIUS = 80;
 
 export class VideoSurface {
   readonly group = new THREE.Group();
@@ -19,7 +19,6 @@ export class VideoSurface {
   private panoVideoMaterial: THREE.MeshBasicMaterial;
   private mode: ViewMode = ViewMode.Cinema;
   private showingVideo = false;
-  private anchor = new THREE.Vector3();
 
   constructor(video: HTMLVideoElement) {
     this.slate = new TitleSlate();
@@ -44,11 +43,13 @@ export class VideoSurface {
       map: this.slateTexture,
       toneMapped: false,
       depthWrite: false,
+      depthTest: false,
     });
     this.panoVideoMaterial = new THREE.MeshBasicMaterial({
       map: this.videoTexture,
       toneMapped: false,
       depthWrite: false,
+      depthTest: false,
     });
 
     this.cinemaScreen = new THREE.Mesh(
@@ -58,7 +59,7 @@ export class VideoSurface {
     this.cinemaScreen.position.set(0, 2.75, -8.82);
     this.cinemaScreen.name = "screen";
 
-    const sphereGeom = new THREE.SphereGeometry(PANO_RADIUS, 64, 40);
+    const sphereGeom = new THREE.SphereGeometry(PANO_RADIUS, 96, 64);
     sphereGeom.scale(-1, 1, 1);
     this.sphere = new THREE.Mesh(sphereGeom, this.panoSlateMaterial);
     this.sphere.frustumCulled = false;
@@ -67,8 +68,8 @@ export class VideoSurface {
 
     const hemiGeom = new THREE.SphereGeometry(
       PANO_RADIUS,
+      64,
       48,
-      32,
       Math.PI / 2,
       Math.PI,
     );
@@ -119,14 +120,6 @@ export class VideoSurface {
   showVideo(show: boolean): void {
     this.showingVideo = show;
     this.applyMaterial();
-  }
-
-  /** Keep the panorama around the headset so 360 never becomes a void. */
-  follow(camera: THREE.Camera): void {
-    if (this.mode !== ViewMode.Sphere && this.mode !== ViewMode.Half) return;
-    camera.getWorldPosition(this.anchor);
-    this.sphere.position.copy(this.anchor);
-    this.hemi.position.copy(this.anchor);
   }
 
   updateSlate(timeMs: number, title: string, subtitle: string, status: string): void {
