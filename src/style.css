@@ -38,6 +38,33 @@ body {
   touch-action: none;
 }
 
+/*
+ * Quest Browser paints a hardware media overlay (pale cyan rectangle) for any
+ * <video> that participates in the compositor, even at opacity 0. Keep the
+ * decoder attached for playback, but clip it completely out of layout.
+ */
+.video-sink {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 2px;
+  height: 2px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  contain: strict;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -9999;
+}
+
+.video-sink video {
+  display: block;
+  width: 2px;
+  height: 2px;
+  object-fit: fill;
+}
+
 .version-chip {
   position: fixed;
   top: 12px;

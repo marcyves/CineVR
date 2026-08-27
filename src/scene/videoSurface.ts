@@ -3,6 +3,8 @@ import { ViewMode } from "../types.ts";
 import { TitleSlate } from "./slate.ts";
 
 const PANO_RADIUS = 80;
+/** Quest 2 GPU budget for the copied film frame. */
+const MAX_BLIT_EDGE = 1280;
 
 export class VideoSurface {
   readonly group = new THREE.Group();
@@ -11,7 +13,12 @@ export class VideoSurface {
   readonly hemi: THREE.Mesh;
   readonly slate: TitleSlate;
   readonly slateTexture: THREE.CanvasTexture;
-  readonly videoTexture: THREE.VideoTexture;
+  readonly filmTexture: THREE.CanvasTexture;
+
+  private readonly video: HTMLVideoElement;
+  private readonly blitCanvas: HTMLCanvasElement;
+  private readonly blitCtx: CanvasRenderingContext2D;
+  private readonly useVideoFrameCallback: boolean;
 
   private screenSlateMaterial: THREE.MeshBasicMaterial;
   private screenVideoMaterial: THREE.MeshBasicMaterial;
@@ -22,36 +29,50 @@ export class VideoSurface {
   private frameDirty = true;
 
   constructor(video: HTMLVideoElement) {
+    this.video = video;
     this.slate = new TitleSlate();
     this.slateTexture = new THREE.CanvasTexture(this.slate.canvas);
     this.slateTexture.colorSpace = THREE.SRGBColorSpace;
 
-    this.videoTexture = new THREE.VideoTexture(video);
-    this.videoTexture.colorSpace = THREE.SRGBColorSpace;
-    this.videoTexture.minFilter = THREE.LinearFilter;
-    this.videoTexture.magFilter = THREE.LinearFilter;
-    this.videoTexture.generateMipmaps = false;
-    this.videoTexture.wrapS = THREE.ClampToEdgeWrapping;
-    this.videoTexture.wrapT = THREE.ClampToEdgeWrapping;
-    this.videoTexture.update = () => {
-      /* Uploaded once per animation frame in commitFrame() so both XR eyes share the same picture. */
-    };
+    this.blitCanvas = document.createElement("canvas");
+    this.blitCanvas.width = 16;
+    this.blitCanvas.height = 16;
+    const ctx = this.blitCanvas.getContext("2d", {
+      alpha: false,
+      desynchronized: true,
+    });
+    if (!ctx) throw new Error("Canvas 2D indisponible pour la copie vidéo.");
+    this.blitCtx = ctx;
+    this.blitCtx.fillStyle = "#000";
+    this.blitCtx.fillRect(0, 0, 16, 16);
+    this.blitCtx.imageSmoothingEnabled = true;
+    this.blitCtx.imageSmoothingQuality = "medium";
 
+    this.filmTexture = new THREE.CanvasTexture(this.blitCanvas);
+    this.filmTexture.colorSpace = THREE.SRGBColorSpace;
+    this.filmTexture.minFilter = THREE.LinearFilter;
+    this.filmTexture.magFilter = THREE.LinearFilter;
+    this.filmTexture.generateMipmaps = false;
+    this.filmTexture.wrapS = THREE.ClampToEdgeWrapping;
+    this.filmTexture.wrapT = THREE.ClampToEdgeWrapping;
+
+    this.useVideoFrameCallback = "requestVideoFrameCallback" in video;
     const onVideoFrame = () => {
       this.frameDirty = true;
-      if ("requestVideoFrameCallback" in video) {
+      if (this.useVideoFrameCallback) {
         video.requestVideoFrameCallback(onVideoFrame);
       }
     };
-    if ("requestVideoFrameCallback" in video) {
+    if (this.useVideoFrameCallback) {
       video.requestVideoFrameCallback(onVideoFrame);
     }
+    video.addEventListener("loadedmetadata", () => this.resizeBlitCanvas());
 
     this.screenSlateMaterial = new THREE.MeshBasicMaterial({
       map: this.slateTexture,
     });
     this.screenVideoMaterial = new THREE.MeshBasicMaterial({
-      map: this.videoTexture,
+      map: this.filmTexture,
     });
     this.panoSlateMaterial = new THREE.MeshBasicMaterial({
       map: this.slateTexture,
@@ -60,7 +81,7 @@ export class VideoSurface {
       depthTest: false,
     });
     this.panoVideoMaterial = new THREE.MeshBasicMaterial({
-      map: this.videoTexture,
+      map: this.filmTexture,
       toneMapped: false,
       depthWrite: false,
       depthTest: false,
@@ -102,7 +123,7 @@ export class VideoSurface {
         camera: THREE.Camera,
       ) => {
         if (!this.showingVideo || this.mode !== ViewMode.Sbs) return;
-        const tex = this.videoTexture;
+        const tex = this.filmTexture;
         tex.repeat.set(0.5, 1);
         if (!r.xr.isPresenting) {
           tex.offset.set(0, 0);
@@ -137,12 +158,24 @@ export class VideoSurface {
     this.applyMaterial();
   }
 
-  /** Call once per animation frame, before renderer.render. */
+  /** Copy the decoder frame once per animation frame, before renderer.render. */
   commitFrame(): void {
-    const video = this.videoTexture.source.data as HTMLVideoElement;
+    const video = this.video;
     if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
-    if ("requestVideoFrameCallback" in video && !this.frameDirty) return;
-    this.videoTexture.needsUpdate = true;
+    if (this.useVideoFrameCallback && !this.frameDirty) return;
+    this.resizeBlitCanvas();
+    try {
+      this.blitCtx.drawImage(
+        video,
+        0,
+        0,
+        this.blitCanvas.width,
+        this.blitCanvas.height,
+      );
+    } catch {
+      return;
+    }
+    this.filmTexture.needsUpdate = true;
     this.frameDirty = false;
   }
 
@@ -150,6 +183,22 @@ export class VideoSurface {
     if (this.showingVideo) return;
     this.slate.draw(timeMs, title, subtitle, status);
     this.slateTexture.needsUpdate = true;
+  }
+
+  private resizeBlitCanvas(): void {
+    const vw = this.video.videoWidth;
+    const vh = this.video.videoHeight;
+    if (!vw || !vh) return;
+    const scale = Math.min(1, MAX_BLIT_EDGE / Math.max(vw, vh));
+    const w = Math.max(2, Math.round(vw * scale));
+    const h = Math.max(2, Math.round(vh * scale));
+    if (this.blitCanvas.width === w && this.blitCanvas.height === h) return;
+    this.blitCanvas.width = w;
+    this.blitCanvas.height = h;
+    this.blitCtx.imageSmoothingEnabled = true;
+    this.blitCtx.imageSmoothingQuality = "medium";
+    this.filmTexture.needsUpdate = true;
+    this.frameDirty = true;
   }
 
   private applyMaterial(): void {
@@ -168,11 +217,11 @@ export class VideoSurface {
     }
 
     if (this.showingVideo && this.mode === ViewMode.Sbs) {
-      this.videoTexture.repeat.set(0.5, 1);
-      this.videoTexture.offset.set(0, 0);
+      this.filmTexture.repeat.set(0.5, 1);
+      this.filmTexture.offset.set(0, 0);
     } else {
-      this.videoTexture.repeat.set(1, 1);
-      this.videoTexture.offset.set(0, 0);
+      this.filmTexture.repeat.set(1, 1);
+      this.filmTexture.offset.set(0, 0);
     }
   }
 }

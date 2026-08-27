@@ -94,7 +94,7 @@ function setMode(mode: ViewMode): void {
   cinema.visible = !hideRoom;
   lights.visible = !hideRoom;
   scene.fog = hideRoom ? null : new THREE.Fog(0x07060c, 12, 24);
-  scene.background = new THREE.Color(hideRoom ? 0x102038 : 0x07060c);
+  scene.background = new THREE.Color(hideRoom ? 0x000000 : 0x07060c);
   renderer.xr.setFoveation(hideRoom ? 0 : 0.75);
 }
 
